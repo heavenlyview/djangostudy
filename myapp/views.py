@@ -6,27 +6,37 @@ topics = [
     {'id':3, 'title':'Model', 'body':'Model is ..'},
 ]
 
-def index(request):
+def HTMLTemplate(articleTag):
     global topics # topics는 전역변수다라고 선언
     ol = ''
     for topic in topics:
         ol += f'<li><a href="/read/{topic["id"]}">{topic["title"]}</a></li>'
-        
-    return HttpResponse(f'''
+    return f'''
     <html>
     <body>
-        <h1>Django</h1>
-        <ol>
+        <h1><a href="/">Django</a></h1>
+        <ul>
             {ol}
-        <ol>
-        <h2>welcome</h2>
-        Hello, Django
+        <ul>
+        {articleTag}
     </body>
     </html>
-    ''') 
+    '''
+def index(request):
+    article = '''
+    <h2>welcome</h2>
+    Hello, Django
+    '''
+    return HttpResponse(HTMLTemplate(article))
 
 def create(request):
     return HttpResponse('Create')
 
 def read(request, id):
-    return HttpResponse('Read!'+id)
+    global topics
+    article = ''
+    for topic in topics:
+        if topic['id'] == int(id):
+            article = f'<h2>{topic["title"]}</h2>{topic["body"]}'
+
+    return HttpResponse(HTMLTemplate(article))
