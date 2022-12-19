@@ -1,9 +1,9 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.csrf import csrf_exempt
 # CSRF 보안 기능 우회하기 (제외하기) 불러오기
 import random # 접속이 들어올 때마다 랜덤한 정보를 동적으로 만들어주는 웹 애플리케이션을 만들어 줄 때에 필요함
 
-
+nextId = 4
 topics = [
     {'id':1, 'title':'routing', 'body':'Routing is ..'},
     {'id':2, 'title':'view', 'body':'View is ..'},
@@ -29,7 +29,7 @@ def HTMLTemplate(articleTag):
     </body>
     </html>
     '''
-@csrf_exempt
+
 def index(request):
     article = '''
     <h2>welcome</h2>
@@ -37,15 +37,26 @@ def index(request):
     '''
     return HttpResponse(HTMLTemplate(article))
 
+@csrf_exempt
 def create(request):
-    article = '''
-        <form action="/create/">
-            <p><input type="text" name="title" placeholder="title"></p>
-            <p><textarea name="body" placeholder="body"></textarea></p>
-            <p><input type="submit"></p>
-        </form>
-    '''
-    return HttpResponse(HTMLTemplate(article))
+    global nextId
+    if request.method == 'GET':
+        article = '''
+            <form action="/create/" method="post">
+                <p><input type="text" name="title" placeholder="title"></p>
+                <p><textarea name="body" placeholder="body"></textarea></p>
+                <p><input type="submit"></p>
+            </form>
+        '''
+        return HttpResponse(HTMLTemplate(article))
+    elif request.method == 'POST':
+        title = request.POST['title']
+        body = request.POST['body']
+        newTopic = {"id":nextId, "title":title, "body":body}
+        topics.append(newTopic)
+        url = '/read/'+ str(nextId)
+        nextId = nextId + 1
+        return redirect(url)
 
 def read(request, id):
     global topics
