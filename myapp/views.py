@@ -19,6 +19,9 @@ def HTMLTemplate(articleTag):
             {ol}
         <ul>
         {articleTag}
+        <ul>
+            <a href="/create/">create</a>
+        </ul> 
     </body>
     </html>
     '''
@@ -30,7 +33,14 @@ def index(request):
     return HttpResponse(HTMLTemplate(article))
 
 def create(request):
-    return HttpResponse('Create')
+    article = '''
+        <form action="/create/">
+            <p><input type="text" name="title" placeholder="title"></p>
+            <p><textarea name="body" placeholder="body"></textarea></p>
+            <p><input type="submit"></p>
+        </form>
+    '''
+    return HttpResponse(HTMLTemplate(article))
 
 def read(request, id):
     global topics
